@@ -69,7 +69,8 @@ typedef uint8_t u8, __u8;
 
 typedef int32_t __s32;
 
-#define __u64 u64
+typedef unsigned long long __u64;
+
 #define __u32 u32
 #define __u16 u16
 

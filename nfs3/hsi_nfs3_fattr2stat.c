@@ -19,7 +19,7 @@
 
 #include <errno.h>
 #include "hsi_nfs3.h"
-#include "../fuse/fuse_misc.h"
+#include "../hsfs/fuse_misc.h"
 
 int hsi_nfs3_fattr2stat(struct fattr3 *attr, struct stat *st)
 {

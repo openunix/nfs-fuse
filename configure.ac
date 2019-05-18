@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hsfs], [0.3], [steve.shuo.feng@gmail.com])
-AC_CONFIG_SRCDIR([fuse/hsfs_main.c])
+AC_INIT([nfs-fuse], [0.3.1], [steve.shuo.feng@gmail.com])
+AC_CONFIG_SRCDIR([hsfs/hsfs_main.c])
 AC_CONFIG_HEADERS([include/config.h])
 
 AM_INIT_AUTOMAKE
@@ -84,7 +84,7 @@ else
 fi
 
 AC_CONFIG_FILES([Makefile
-                 fuse/Makefile
+                 hsfs/Makefile
                  nfs3/Makefile
                  man/Makefile
 		 lib/Makefile
