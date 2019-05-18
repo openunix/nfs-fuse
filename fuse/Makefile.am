@@ -1,16 +1,11 @@
 include $(top_srcdir)/Makefile.common
 
-bin_PROGRAMS = hsfs
-hsfs_CPPFLAGS = $(AM_CFLAGS) -g -Wall -I/usr/include/tirpc/ \
-			`pkg-config fuse --cflags` 
-hsfs_LDFLAGS = `pkg-config fuse --libs`
-hsfs_LDADD = $(top_builddir)/fuse/libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \
+bin_PROGRAMS = nfs-fuse
+nfs_fuse_LDADD = $(top_builddir)/fuse/libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \
 	$(top_builddir)/lib/libhsfs.a $(top_builddir)/nfs_common/libhsi_nfsc.a
-hsfs_SOURCES = xcommon.c hsfs_main.c
+nfs_fuse_SOURCES = xcommon.c hsfs_main.c
 
 noinst_LIBRARIES = libhsx_fuse.a
-libhsx_fuse_a_CPPFLAGS = $(AM_CFLAGS) -g -Wall -I/usr/include/tirpc/ \
-			`pkg-config fuse --cflags`
 libhsx_fuse_a_SOURCES = hsx_fuse_getattr.c hsx_fuse_statfs.c hsx_fuse_init.c \
 			hsx_fuse_lookup.c hsx_fuse_fill_reply.c hsx_fuse_mkdir.c \
 			hsx_fuse_read.c hsx_fuse_write.c hsx_fuse_open.c hsx_fuse_release.c \
