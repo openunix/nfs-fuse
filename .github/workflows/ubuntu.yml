@@ -8,10 +8,26 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - run: sudo apt install libtirpc-dev libkrb5-dev libfuse-dev
+    - name: install dependency
+      run: sudo apt install libtirpc-dev libkrb5-dev meson ninja-build
 
-    - uses: actions/checkout@v2
+    - name: checkout libfuse3
+      uses: actions/checkout@v2
+      with:
+        repository: libfuse/libfuse
+        ref: fuse-3.9.0
 
+    - name: install libfuse3
+      shell: bash
+      run: |
+        mkdir build; cd build
+        meson ..
+        ninja
+        sudo ninja install
+        sudo ldconfig
+
+    - name: checkout nfs-fuse
+      uses: actions/checkout@v2
     - name: autogen.sh
       run: ./autogen.sh
     - name: configure

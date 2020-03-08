@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([nfs-fuse], [0.3.1], [steve.shuo.feng@gmail.com])
-AC_CONFIG_SRCDIR([fuse/hsfs_main.c])
+AC_INIT([nfs-fuse], [0.3.2], [steve.shuo.feng@gmail.com])
+AC_CONFIG_SRCDIR([fuse/main.c])
 AC_CONFIG_HEADERS([include/config.h])
 
 AM_INIT_AUTOMAKE
@@ -31,11 +31,10 @@ AC_GNU_SOURCE
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
-AC_CHECK_LIB([fuse], [fuse_lowlevel_new], [], AC_MSG_ERROR([You need libfuse to run.]))
+AC_CHECK_LIB([fuse3], [fuse_session_mount], [], AC_MSG_ERROR([You need libfuse3 to run.]))
 AC_CHECK_LIB([tirpc], [clnt_tp_create], [], AC_MSG_ERROR([You need libtirpc to run.]))
 
-    FUSE_CFLAGS=`pkg-config fuse --cflags`
-
+FUSE_CFLAGS=`pkg-config fuse3 --cflags`
 AC_SUBST(FUSE_CFLAGS)
 
 # Checks for header files.

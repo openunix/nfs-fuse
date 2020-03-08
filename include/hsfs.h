@@ -295,4 +295,15 @@ void hsfs_iput(struct hsfs_inode *inode);
 void hsfs_unlock_new_inode(struct hsfs_inode *inode);
 void hsfs_generic_fillattr(struct hsfs_inode *, struct stat *);
 int hsfs_ll_setattr(struct hsfs_inode *inode, struct hsfs_iattr *sattr); 
+
+struct hsfs_cmdline_opts{
+        int flags;
+        int fake;
+        int fg;
+
+        char *spec;
+        /* Temporary for backwards compact */
+        char *udata;
+};
+
 #endif
