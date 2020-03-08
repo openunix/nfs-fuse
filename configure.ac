@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE
 # SLES 11SP2 (automake-1.10.1) doesn't have this
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# Cygwin put tirpc into /usr/include/tirpc.
+TIRPC_HEADERS="-I /usr/include/tirpc"
 AC_SUBST([TIRPC_HEADERS])
 AC_ARG_WITH([tirpc-headers],
 	[AC_HELP_STRING([--with-tirpc-headers=<path>], [Alternative path to tirpc headers])],
@@ -33,6 +33,10 @@ AC_PROG_LIBTOOL
 # Checks for libraries.
 AC_CHECK_LIB([fuse], [fuse_lowlevel_new], [], AC_MSG_ERROR([You need libfuse to run.]))
 AC_CHECK_LIB([tirpc], [clnt_tp_create], [], AC_MSG_ERROR([You need libtirpc to run.]))
+
+    FUSE_CFLAGS=`pkg-config fuse --cflags`
+
+AC_SUBST(FUSE_CFLAGS)
 
 # Checks for header files.
 AC_HEADER_ASSERT
@@ -84,6 +88,7 @@ else
 fi
 
 AC_CONFIG_FILES([Makefile
+                 include/Makefile
                  fuse/Makefile
                  nfs3/Makefile
                  man/Makefile
