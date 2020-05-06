@@ -3,7 +3,7 @@ include $(top_srcdir)/Makefile.common
 bin_PROGRAMS = nfs-fuse
 nfs_fuse_LDADD = $(top_builddir)/fuse/libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \
 	$(top_builddir)/lib/libhsfs.a $(top_builddir)/nfs_common/libhsi_nfsc.a \
-	$(top_builddir)/mount/libmount.a
+	$(top_builddir)/mount/libmount.a $(top_builddir)/nfs4/libnfs4.a
 
 nfs_fuse_SOURCES = xcommon.c main.c
 

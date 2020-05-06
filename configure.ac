@@ -94,5 +94,6 @@ AC_CONFIG_FILES([Makefile
 		 lib/Makefile
 		 nfs_common/Makefile
 		 mount/Makefile
+		 nfs4/Makefile
 		])
 AC_OUTPUT
