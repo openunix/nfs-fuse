@@ -15,6 +15,8 @@
 #include <rpc/rpc_com.h>
 #include <rpc/auth_gss.h>
 
+#include "utils/mount/parse_dev.h"
+
 #include "log.h"
 #include "hsfs.h"
 #include "conn.h"
@@ -252,28 +254,7 @@ out:
 static int hsi_parse_spec(char *devname, char **hostname,
 				char **pathname)
 {
-	char *s = NULL;
-
-	if (devname == NULL)
-		return EINVAL;
-
-	if ((s = strchr(devname, ':'))) {
-		*hostname = devname;
-		*pathname = s + 1;
-		*s = '\0';
-		/* Ignore all but first hostname in replicated mounts
-		   until they can be fully supported. (mack@sgi.com) */
-		if ((s = strchr(devname, ','))) {
-			*s = '\0';
-			ERR("%s: warning: multiple hostnames not supported.",
-				progname);
-		}
-	} else {
-		ERR("%s: directory to mount not in host:dir format.", progname);
-		return -1;
-	}
-
-	return 0;
+	return !nfs_parse_devname(devname, hostname, pathname);
 }
 
 static int hsi_nfs3_parse_options(char *old_opts, struct hsfs_super *super,
@@ -606,7 +587,7 @@ out:
 	return ret;
 }
 
-int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
+int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 				  struct hsfs_super *super)
 {
 	char *spec = hsfs_opts->spec;

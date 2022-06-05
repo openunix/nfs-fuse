@@ -14,6 +14,8 @@
 #include <getopt.h>
 #include <errno.h>
 
+#include "utils/mount/parse_dev.h"
+
 #include "log.h"
 #include "hsfs.h"
 #include "hsx_fuse.h"
@@ -359,6 +361,9 @@ static const struct fuse_opt hsfs_cmdline_spec[] = {
 	HSFS_CMD_OPT("--fake", fake),
 	FUSE_OPT_KEY("-v", 'v'),
 	FUSE_OPT_KEY("-f", 'f'),
+
+	HSFS_CMD_OPT("nfsvers=%d", nfsvers),
+	HSFS_CMD_OPT("vers=%d", nfsvers),
 	FUSE_OPT_END
 };
 
@@ -421,11 +426,27 @@ static int hsfs_parse_cmdline(struct fuse_args *args,
 			goto out;
 	}
 
-	/* add fs mode */
+	if (hsfs_opts->nfsvers != 4 && hsfs_opts->nfsvers != 3
+		&& hsfs_opts->nfsvers != 0){
+		fprintf(stderr,
+"Unsupported NFS version: %d\n", hsfs_opts->nfsvers);
+		goto out_usage;
+    }
+
 	if (hsfs_opts->spec == NULL){
 		ret = 1;
 		goto out_usage;
 	}
+
+	ret = nfs_parse_devname(hsfs_opts->spec, &hsfs_opts->hostname,
+							&hsfs_opts->pathname);
+	if (ret == 0){
+		fprintf(stderr,
+"Incorrect nfs mount spec: %s\n", hsfs_opts->spec);
+		ret = 1;
+		goto out_usage;
+	}
+
 	if (fuse_opts->mountpoint == NULL) {
 		ret = 1;
 		goto out_usage;
@@ -438,6 +459,37 @@ out_usage:
 	/* Never reach here... */
 out:
 	return ret;
+}
+
+int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
+		struct hsfs_super *sb)
+{
+	int err;
+
+	if (hsfs_opts->nfsvers != 4)
+		return nfs3_do_mount(hsfs_opts, sb);
+
+
+	sb->nfs = nfs_init_context();
+	if (sb->nfs == NULL) {
+		err = errno;
+		fprintf(stderr, "Failed to init libnfs context\n");
+		goto out;
+	}
+
+	err = nfs_set_version(sb->nfs, 4);
+	if (err) {
+		goto out;
+	}
+
+	err = nfs_mount(sb->nfs, hsfs_opts->hostname, hsfs_opts->pathname);
+
+	printf("NFSv4 is not supported yet. nfs_mount return %d\n", err);
+
+	exit(0);
+
+out:
+	return err;
 }
 
 int main(int argc, char **argv)

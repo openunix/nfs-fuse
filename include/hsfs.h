@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+#include <nfsc/libnfs.h>
+
 #include "nfs3.h"
 #include "log.h"
 
@@ -167,6 +169,7 @@ struct hsfs_super
 	DECLARE_HASHTABLE(fh_table, HSFS_FH_HASH_BITS); /* For HSFS iget5 */
 	DECLARE_HASHTABLE(id_table, HSFS_ID_HASH_BITS);	/* For HSFS iget/ilookup */
 	struct hsfs_super_ops *sop;
+  struct nfs_context *nfs;
 
 	/* XXX need protected by mutex */
 	unsigned long curr_id;
@@ -301,9 +304,16 @@ struct hsfs_cmdline_opts{
         int fake;
         int fg;
 
+        int nfsvers;
+        char *hostname;
+        char *pathname;
+
         char *spec;
         /* Temporary for backwards compact */
         char *udata;
 };
+
+int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
+                  struct hsfs_super *super);
 
 #endif

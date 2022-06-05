@@ -6,7 +6,7 @@ AC_INIT([nfs-fuse], [0.3.3], [steve.shuo.feng@gmail.com])
 AC_CONFIG_SRCDIR([hsfs/hsfs_main.c])
 AC_CONFIG_HEADERS([include/config.h])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 # SLES 11SP2 (automake-1.10.1) doesn't have this
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -33,6 +33,7 @@ AC_PROG_LIBTOOL
 # Checks for libraries.
 AC_CHECK_LIB([fuse3], [fuse_session_mount], [], AC_MSG_ERROR([You need libfuse3 to run.]))
 AC_CHECK_LIB([tirpc], [clnt_tp_create], [], AC_MSG_ERROR([You need libtirpc to run.]))
+AC_CHECK_LIB([nfs], [nfs_init_context], [], AC_MSG_ERROR([You need libnfs to run.]))
 
 FUSE_CFLAGS=`pkg-config fuse3 --cflags`
 AC_SUBST(FUSE_CFLAGS)
@@ -65,8 +66,7 @@ AC_C_INLINE
 # Checks for library functions.
 AC_FUNC_CHOWN
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+
 AC_CHECK_FUNCS([alarm gethostbyname hasmntopt inet_ntoa memset realpath socket strchr strcspn strdup strerror strrchr strstr uname])
 
 # Check for system service
