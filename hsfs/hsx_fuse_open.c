@@ -2,6 +2,7 @@
  * hsx_fuse_open
  * liuyoujin
  */
+#include <hsx_fuse.h>
 #include <sys/errno.h>
 #include "hsi_nfs3.h"
 #include "log.h"
