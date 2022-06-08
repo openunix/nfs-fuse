@@ -6,7 +6,7 @@ AC_INIT([nfs-fuse], [0.3.3], [steve.shuo.feng@gmail.com])
 AC_CONFIG_SRCDIR([hsfs/hsfs_main.c])
 AC_CONFIG_HEADERS([include/config.h])
 
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 # SLES 11SP2 (automake-1.10.1) doesn't have this
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])

@@ -4,7 +4,7 @@ AM_CFLAGS = -Wall -Wextra
 
 bin_PROGRAMS = nfs-fuse
 nfs_fuse_LDADD = libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \
-	$(top_builddir)/lib/libhsfs.a $(top_builddir)/nfs_common/libhsi_nfsc.a \
+	$(top_builddir)/lib/libnfsfh.a $(top_builddir)/nfs_common/libhsi_nfsc.a \
 	$(top_builddir)/utils/libmount.a
 nfs_fuse_SOURCES = xcommon.c hsfs_main.c
 
@@ -18,5 +18,5 @@ libhsx_fuse_a_SOURCES = hsx_fuse_getattr.c hsx_fuse_statfs.c hsx_fuse_init.c \
 			hsx_fuse_opendir.c hsx_fuse_setxattr.c \
 			hsx_fuse_mknod.c hsx_fuse_link.c hsx_fuse_create.c \
 			hsx_fuse_access.c hsx_fuse_getxattr.c hsx_fuse_stat2iattr.c \
-            fuse_misc.h
+            fuse_misc.h hsfs_inode.c
 
