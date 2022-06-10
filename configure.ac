@@ -48,6 +48,11 @@ AC_HEADER_STDBOOL
 
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h limits.h memory.h mntent.h netdb.h netinet/in.h paths.h stdlib.h string.h sys/mount.h sys/socket.h sys/time.h syslog.h unistd.h])
 
+# Required by libnfs
+AC_SUBST([LIBSOCKET])
+
+AC_CHECK_HEADERS([sys/sysmacros.h poll.h utime.h net/if.h sys/ioctl.h sys/vfs.h sys/statvfs.h netinet/tcp.h])
+
 # Checks for types.
 AC_TYPE_INT32_T
 AC_TYPE_MODE_T
@@ -59,6 +64,26 @@ AC_TYPE_UID_T
 # Checks for structures
 AC_CHECK_MEMBERS([struct stat.st_atim])
 AC_CHECK_MEMBERS([struct stat.st_atimespec])
+
+# check for SA_LEN
+dnl Check if sockaddr data structure includes a "sa_len"
+AC_CHECK_MEMBER([struct sockaddr.sa_len],
+                [ AC_DEFINE(HAVE_SOCKADDR_LEN,1,[Whether sockaddr struct has sa_len]) ],
+                [],
+                [
+#include <sys/types.h>
+#include <sys/socket.h>
+])
+
+# check for sockaddr_storage
+dnl Check if sockaddr structure includes a "ss_family"
+AC_CHECK_MEMBER([struct sockaddr_storage.ss_family],
+                [ AC_DEFINE(HAVE_SOCKADDR_STORAGE,1,[Whether we have sockaddr_Storage]) ],
+                [],
+                [
+#include <sys/types.h>
+#include <sys/socket.h>
+])
 
 # Check for compiler characteristics.
 AC_C_INLINE
@@ -89,6 +114,8 @@ fi
 AC_CONFIG_FILES([Makefile
                  include/Makefile
                  hsfs/Makefile
+		 nfs/Makefile
+		 nfs4/Makefile
                  nfs3/Makefile
                  man/Makefile
 		 lib/Makefile

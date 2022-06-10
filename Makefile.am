@@ -1,2 +1,2 @@
 
-SUBDIRS = include nfs3 utils nfs_common lib hsfs man
+SUBDIRS = man utils nfs nfs4 lib include nfs3 nfs_common hsfs
