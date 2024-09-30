@@ -1,7 +1,6 @@
 
 #include <errno.h>
 #include "hsi_nfs3.h"
-#include "hsx_fuse.h"
 #include "nfs3.h"
 #include "acl.h"
 

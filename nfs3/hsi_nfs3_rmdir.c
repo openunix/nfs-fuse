@@ -1,5 +1,4 @@
 #include "hsi_nfs3.h"
-#include "hsx_fuse.h"
 
 #ifdef HSFS_NFS3_TEST
 #include <stdio.h>

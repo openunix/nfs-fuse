@@ -1,3 +1,4 @@
+#include <hsx_fuse.h>
 #include "hsi_nfs3.h"
 #include "hsfs.h"
 #include "nfs3.h"

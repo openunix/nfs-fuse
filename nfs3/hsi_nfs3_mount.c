@@ -606,11 +606,11 @@ out:
 	return ret;
 }
 
-struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
-				  struct fuse_args *args, char *udata,
+int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 				  struct hsfs_super *super)
 {
-	struct fuse_chan *ch = NULL;
+	char *spec = hsfs_opts->spec;
+	char *udata = hsfs_opts->udata;
 	char hostdir[1024] = {};
 	char *hostname, *dirname, *old_opts;
 	char new_opts[1024] = {};
@@ -631,7 +631,7 @@ struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
 
 	mntres_t mntres;
 	
-	int retry = 0, ret = 0;
+	int retry = 0, ret = -1;
 	char *s = NULL;
 	time_t timeout, t;
 
@@ -689,7 +689,7 @@ struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
 	for (;;) {
 		int val = 1;
 
-		if (!fg) {
+		if (!hsfs_opts->fg) {
 			sleep(val);	/* 1, 2, 4, 8, 16, 30, ... */
 			val *= 2;
 			if (val > 30)
@@ -705,7 +705,7 @@ struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
 		memcpy(nfs_pmap, &save_nfs, sizeof(*nfs_pmap));
 		memcpy(mnt_pmap, &save_mnt, sizeof(*mnt_pmap));
 
-		if (fg) {
+		if (hsfs_opts->fg) {
 			switch(rpc_createerr.cf_stat){
 			case RPC_TIMEDOUT:
 				break;
@@ -728,7 +728,7 @@ struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
 			continue;
 		}
 
-		if (fg && retry > 0)
+		if (hsfs_opts->fg && retry > 0)
 			goto fail;
 	}
 
@@ -771,30 +771,24 @@ struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
 
 		free(mntres.mountres3_u.mountinfo.fhandle.fhandle3_val);
 	}
-	
-	ch = fuse_mount(point, args);
-	if (ch == NULL) {
-		goto fmnt_fail;
-	}
 
-	DEBUG_OUT("Success with FUSE channel at %p", ch);
-	return ch;
+	DEBUG_OUT("Success.");
+
+	return 0;
 
 umnt_fail:
 	free(mntres.mountres3_u.mountinfo.fhandle.fhandle3_val);
-fmnt_fail:
 	if (super->acl_clntp)
 		clnt_destroy(super->acl_clntp);
 
 	clnt_destroy(super->clntp);
 	hsi_nfs3_unmount(&mnt_server, &dirname);
 fail:
-	DEBUG_OUT("Failed with FUSE chanel at %p", NULL);
-	return NULL;
+	DEBUG_OUT("Failed with %d", ret);
+	return ret;
 }
 
-int hsx_fuse_unmount(const char *spec, const char *point,
-					struct fuse_chan *ch,
+int hsfs_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
 					struct hsfs_super *super)
 {
 	char hostdir[1024] = {};
@@ -805,11 +799,10 @@ int hsx_fuse_unmount(const char *spec, const char *point,
 	
 	struct pmap *ump = &mnt_server.pmap;
 
-	strcpy(hostdir, spec);
+	strcpy(hostdir, hsfs_opts->spec);
 	if (hsi_parse_spec(hostdir, &hostname, &dirname))
 		return -1;
 
-	fuse_unmount(point, ch);
 	CLNT_DESTROY(super->clntp);
 
 	memcpy(&mnt_server.saddr, &super->addr, sizeof(struct sockaddr_in));

@@ -5,11 +5,7 @@
 #include <hsfs/types.h>
 #include <assert.h>
 
-#ifndef FUSE_USE_VERSION
-#define FUSE_USE_VERSION 26
-#endif
-
-#include <fuse/fuse_lowlevel.h>
+#include <sys/statvfs.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
@@ -299,4 +295,15 @@ void hsfs_iput(struct hsfs_inode *inode);
 void hsfs_unlock_new_inode(struct hsfs_inode *inode);
 void hsfs_generic_fillattr(struct hsfs_inode *, struct stat *);
 int hsfs_ll_setattr(struct hsfs_inode *inode, struct hsfs_iattr *sattr); 
+
+struct hsfs_cmdline_opts{
+        int flags;
+        int fake;
+        int fg;
+
+        char *spec;
+        /* Temporary for backwards compact */
+        char *udata;
+};
+
 #endif

@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <hsx_fuse.h>
 #include "hsi_nfs3.h"
 
 void hsx_fuse_getattr(fuse_req_t req, fuse_ino_t ino,

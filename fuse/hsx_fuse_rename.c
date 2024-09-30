@@ -4,13 +4,19 @@
 #include <errno.h>
 
 void hsx_fuse_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
-				fuse_ino_t newparent, const char *newname)
+		fuse_ino_t newparent, const char *newname, unsigned int flags)
 {
 	int err = 0;
 	struct hsfs_super *sb = NULL;
 	struct hsfs_inode *hi = NULL, *newhi = NULL;
 
-	DEBUG_IN(" %s to %s", name, newname);
+	DEBUG_IN(" %s to %s, with flags 0x%x", name, newname, flags);
+
+	if (flags != 0){
+		ERR("Only RENAME_NOREPLACE is supported.\n");
+		err = EINVAL;
+		goto out;
+	}
 
 	if (name == NULL) {
 		ERR("Source name is NULL\n");

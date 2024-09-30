@@ -50,7 +50,6 @@ static void __free_ctx(struct hsfs_readdir_ctx *ctx,
 
 }
 
-#ifdef FUSE_CAP_READDIR_PLUS
 void hsx_fuse_readdir_plus(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off,
 			   struct fuse_file_info *fi)
 {
@@ -111,7 +110,6 @@ out1:
 	DEBUG_OUT("with %d, %d entries returned", err, count);
 	return;
 }
-#endif
 
 void hsx_fuse_readdir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off,
 		      struct fuse_file_info *fi)

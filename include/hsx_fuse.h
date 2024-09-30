@@ -2,6 +2,11 @@
 #ifndef __HSX_FUSE_H__
 #define __HSX_FUSE_H__ 
 
+#ifndef FUSE_USE_VERSION
+#define FUSE_USE_VERSION 32
+#endif
+
+#include <fuse_lowlevel.h>
 #include <sys/stat.h>
 #include <hsfs.h>
 
@@ -103,7 +108,8 @@ extern void hsx_fuse_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
  * @param newname[in] new name
  **/
 extern void hsx_fuse_rename(fuse_req_t req, fuse_ino_t parent, const char *name, 
-			    fuse_ino_t newparent, const char *newname);
+			    fuse_ino_t newparent, const char *newname,
+			    unsigned int flags);
 
 /**
  * @brief Read the content of the symlink
@@ -320,8 +326,7 @@ extern void hsx_fuse_opendir(fuse_req_t req,  fuse_ino_t ino,  struct fuse_file_
  * 
  * @return fuse channel
  */
-extern struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
-					struct fuse_args *args, char *udata,
+extern int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 					struct hsfs_super *super);
 
 /**
@@ -334,8 +339,7 @@ extern struct fuse_chan *hsx_fuse_mount(const char *spec, const char *point,
  * 
  * @return errno number as Linux system
  */
-extern int hsx_fuse_unmount(const char *spec, const char *point,
-					struct fuse_chan *ch,
+extern int hsfs_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
 					struct hsfs_super *super);
 /**
  * @brief Get extended attribute
