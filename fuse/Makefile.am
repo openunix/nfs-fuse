@@ -1,4 +1,6 @@
-include $(top_srcdir)/Makefile.common
+AM_CPPFLAGS = $(FUSE_CFLAGS) -I$(top_srcdir)/include -I$(top_srcdir) $(TIRPC_HEADERS)
+
+AM_CFLAGS = -Wall -Wextra
 
 bin_PROGRAMS = nfs-fuse
 nfs_fuse_LDADD = libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \

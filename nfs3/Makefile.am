@@ -1,4 +1,6 @@
-include $(top_srcdir)/Makefile.common
+AM_CPPFLAGS = $(FUSE_CFLAGS) -I$(top_srcdir)/include -I$(top_srcdir) $(TIRPC_HEADERS)
+
+AM_CFLAGS = -Wall -Wextra
 
 HSFS_NFS3_X = nfs3.xdr
 HSFS_NFS3_H = $(top_builddir)/include/nfs3.h
