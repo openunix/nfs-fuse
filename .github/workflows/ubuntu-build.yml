@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: install dependency
-      run: sudo apt install libtirpc-dev libfuse3-dev libkrb5-dev
+      run: sudo apt install libtirpc-dev libfuse3-dev libkrb5-dev libnfs-dev
     - uses: actions/checkout@v4
     - name: autogen.sh
       run: ./autogen.sh

@@ -20,4 +20,7 @@ noinst_HEADERS = \
     hsfs/list.h  \
     hsfs/log2.h  \
     hsfs/types.h \
-    hsfs_log.h
+    hsfs_log.h \
+    libnfs-private.h \
+    libnfs-multithreading.h \
+    slist.h
