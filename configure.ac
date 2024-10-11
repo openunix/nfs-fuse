@@ -34,6 +34,8 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([fuse3], [fuse_session_mount], [], AC_MSG_ERROR([You need libfuse3 to run.]))
 AC_CHECK_LIB([tirpc], [clnt_tp_create], [], AC_MSG_ERROR([You need libtirpc to run.]))
 
+AC_CHECK_LIB([nfs], [rpc_nfs4_compound_async], [], AC_MSG_ERROR([You need libnfs to run.]))
+
 FUSE_CFLAGS=`pkg-config fuse3 --cflags`
 AC_SUBST(FUSE_CFLAGS)
 
@@ -46,6 +48,21 @@ AC_HEADER_STAT
 AC_HEADER_STDBOOL
 
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h limits.h memory.h mntent.h netdb.h netinet/in.h paths.h stdlib.h string.h sys/mount.h sys/socket.h sys/time.h syslog.h unistd.h])
+
+# Required by the built-in libnfs
+AC_CHECK_HEADERS([sys/sysmacros.h utime.h net/if.h sys/statvfs.h])
+
+AC_CHECK_HEADERS([nfsc/libnfs-raw.h])
+
+# check for sockaddr_storage
+dnl Check if sockaddr structure includes a "ss_family"
+AC_CHECK_MEMBER([struct sockaddr_storage.ss_family],
+                [ AC_DEFINE(HAVE_SOCKADDR_STORAGE,1,[Whether we have sockaddr_Storage]) ],
+                [],
+                [
+#include <sys/types.h>
+#include <sys/socket.h>
+])
 
 # Checks for types.
 AC_TYPE_INT32_T
