@@ -15,6 +15,8 @@
 #include <rpc/rpc_com.h>
 #include <rpc/auth_gss.h>
 
+#include "utils/mount/parse_dev.h"
+
 #include "log.h"
 #include "hsfs.h"
 #include "conn.h"
@@ -247,33 +249,6 @@ static CLIENT *hsi_nfs3_clnt_create(clnt_addr_t *nfs_server,
 		ERR("Bad nfs server.");
 out:
 	return clnt;
-}
-
-static int hsi_parse_spec(char *devname, char **hostname,
-				char **pathname)
-{
-	char *s = NULL;
-
-	if (devname == NULL)
-		return EINVAL;
-
-	if ((s = strchr(devname, ':'))) {
-		*hostname = devname;
-		*pathname = s + 1;
-		*s = '\0';
-		/* Ignore all but first hostname in replicated mounts
-		   until they can be fully supported. (mack@sgi.com) */
-		if ((s = strchr(devname, ','))) {
-			*s = '\0';
-			ERR("%s: warning: multiple hostnames not supported.",
-				progname);
-		}
-	} else {
-		ERR("%s: directory to mount not in host:dir format.", progname);
-		return -1;
-	}
-
-	return 0;
 }
 
 static int hsi_nfs3_parse_options(char *old_opts, struct hsfs_super *super,
@@ -644,7 +619,7 @@ int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 	}
 
 	strcpy(hostdir, spec);
-	if (hsi_parse_spec(hostdir, &hostname, &dirname))
+	if (!nfs_parse_devname(hostdir, &hostname, &dirname))
 		goto fail;
 
 	if (hsi_gethostbyname(hostname, &super->addr) != 0)
@@ -800,7 +775,7 @@ int hsfs_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
 	struct pmap *ump = &mnt_server.pmap;
 
 	strcpy(hostdir, hsfs_opts->spec);
-	if (hsi_parse_spec(hostdir, &hostname, &dirname))
+	if (!nfs_parse_devname(hostdir, &hostname, &dirname))
 		return -1;
 
 	CLNT_DESTROY(super->clntp);

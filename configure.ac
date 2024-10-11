@@ -93,5 +93,6 @@ AC_CONFIG_FILES([Makefile
                  man/Makefile
 		 lib/Makefile
 		 nfs_common/Makefile
+		 utils/Makefile
 		])
 AC_OUTPUT

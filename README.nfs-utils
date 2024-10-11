@@ -1,5 +1,13 @@
-Library stuff from support/nfs
+Some support codes are copied from nfs-utils (GPLv2 also).
+    git://git.linux-nfs.org/projects/steved/nfs-utils.git
 
+New codes are imported by keeping the directory structure to
+make the future fixes applied easier.
+    autogen.sh
+    utils/mount/parse_dev.c
+    utils/mount/parse_dev.h
+
+Historic codes are kept in different directories
 conn.h
 fstab.h
 nfs_mntent.h
