@@ -7,7 +7,11 @@
  */
 
 #ifndef _XMALLOC_H
-#define _MALLOC_H
+#define _XMALLOC_H
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -17,11 +21,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#elif defined(MAJOR_IN_SYSMACROS)
+#include <sys/sysmacros.h>
+#endif
+
 #define streq(s, t)	(strcmp ((s), (t)) == 0)
 
-/* Functions in sundries.c that are used in mount.c and umount.c  */ 
+#ifdef HAVE_FUNC_ATTRIBUTE_FORMAT
+#define X_FORMAT(_x) __attribute__((__format__ _x))
+#else
+#define X_FORMAT(_x)
+#endif
+
+/* Functions in sundries.c that are used in mount.c and umount.c  */
 char *canonicalize (const char *path);
-void nfs_error (const char *fmt, ...);
+void nfs_error (const char *fmt, ...) X_FORMAT((printf, 1, 2));
 void *xmalloc (size_t size);
 void *xrealloc(void *p, size_t size);
 void xfree(void *);
@@ -30,12 +46,13 @@ char *xstrndup (const char *s, int n);
 char *xstrconcat2 (const char *, const char *);
 char *xstrconcat3 (const char *, const char *, const char *);
 char *xstrconcat4 (const char *, const char *, const char *, const char *);
-void die (int errcode, const char *fmt, ...);
+void die (int errcode, const char *fmt, ...) X_FORMAT((printf, 2, 3));
 
-extern void die(int err, const char *fmt, ...);
+extern void die(int err, const char *fmt, ...) X_FORMAT((printf, 2, 3));
 extern void (*at_die)(void);
 
 /* exit status - bits below are ORed */
+#define EX_SUCCESS	0	/* no failure occurred */
 #define EX_USAGE	1	/* incorrect invocation or permission */
 #define EX_SYSERR	2	/* out of memory, cannot fork, ... */
 #define EX_SOFTWARE	4	/* internal mount bug or wrong version */

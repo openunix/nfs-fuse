@@ -2,20 +2,20 @@ Some support codes are copied from nfs-utils (GPLv2 also).
     git://git.linux-nfs.org/projects/steved/nfs-utils.git
 
 New codes are imported by keeping the directory structure to
-make the future fixes applied easier.
+make the future fixes applied easier. Historic imported codes
+are kept in current location with updated to 2.7.1.
     autogen.sh
     utils/mount/parse_dev.c
     utils/mount/parse_dev.h
+    support/nfs/xcommon.c	=> fuse/xcommon.c
+    support/include/xcommon.h	=> include/xcommon.h
+    support/include/nls.h	=> include/nls.h
 
-Historic codes are kept in different directories
+Historic files not updated
 conn.h
 fstab.h
 nfs_mntent.h
-xcommon.h
 conn.c
 fstab.c
 nfs_mntent.c
-xcommon.c
-
-nls.h
 nfs_paths.h
