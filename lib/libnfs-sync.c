@@ -310,6 +310,44 @@ mount_cb(int status, struct nfs_context *nfs, void *data, void *private_data)
 }
 
 int
+try_mount(struct nfs_context *nfs, const char *server, const char *export)
+{
+	struct sync_cb_data cb_data;
+	struct rpc_context *rpc = nfs_get_rpc_context(nfs);
+
+	assert(rpc->magic == RPC_CONTEXT_MAGIC);
+	assert(nfs->nfsi->version == NFS_V4);
+
+        if (nfs_init_cb_data(&nfs, &cb_data)) {
+                return -1;
+        }
+
+	if (nfs4_mount_async(nfs, server, export, mount_cb, &cb_data) != 0) {
+		nfs_set_error(nfs, "nfs_mount_async failed. %s",
+			      nfs_get_error(nfs));
+                nfs_destroy_cb_sem(&cb_data);
+		return -1;
+	}
+
+	wait_for_nfs_reply(nfs, &cb_data);
+        nfs_destroy_cb_sem(&cb_data);
+
+	/* Dont want any more callbacks even if the socket is closed */
+	rpc->connect_cb = NULL;
+
+	/* Ensure that no RPCs are pending. In error case (e.g. timeout in
+	 * wait_for_nfs_reply()) we can disconnect; in success case all RPCs
+	 * are completed by definition.
+	 */
+	if (cb_data.status) {
+		rpc_disconnect(rpc, "failed mount");
+	}
+
+	return cb_data.status;
+}
+
+#if 0
+int
 nfs_mount(struct nfs_context *nfs, const char *server, const char *export)
 {
 	struct sync_cb_data cb_data;
@@ -2730,3 +2768,5 @@ nfs_find_local_servers(void)
 #endif /* WIN32 */
 
 #endif /* !defined(NO_SRV_AUTOSCAN) */
+
+#endif

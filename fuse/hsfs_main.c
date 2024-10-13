@@ -18,6 +18,8 @@
 #include "hsfs.h"
 #include "hsx_fuse.h"
 #include "xcommon.h"
+#include "nls.h"
+#include "utils/mount/parse_dev.h"
 #include "mount_constants.h"
 #include "fstab.h"
 #include "nfs_mntent.h"
@@ -49,7 +51,7 @@ static void exit_usage(int err)
 "usage: %s remotetarget dir [-rvVwfnh] [-o nfsoptions]\n",
 	program_invocation_short_name);
 	if (err)
-		exit(1);
+		exit(EX_USAGE);
 
 	printf("options:\n\t-r\t\tMount file system readonly\n");
 	printf("\t-v\t\tVerbose\n");
@@ -64,7 +66,7 @@ static void exit_usage(int err)
 
 static void print_version(void)
 {
-	printf("%s: %s\n", program_invocation_short_name, PACKAGE_STRING);
+	printf("%s: (%s)\n", program_invocation_short_name, PACKAGE_STRING);
 	printf("FUSE library version %s\n", fuse_pkgversion());
 	fuse_lowlevel_version();
 	exit(0);
@@ -359,6 +361,8 @@ static const struct fuse_opt hsfs_cmdline_spec[] = {
 	HSFS_CMD_OPT("--fake", fake),
 	FUSE_OPT_KEY("-v", 'v'),
 	FUSE_OPT_KEY("-f", 'f'),
+	HSFS_CMD_OPT("nfsvers=%d", nfsvers),
+	HSFS_CMD_OPT("vers=%d", nfsvers),
 	FUSE_OPT_END
 };
 
@@ -421,14 +425,29 @@ static int hsfs_parse_cmdline(struct fuse_args *args,
 			goto out;
 	}
 
-	/* add fs mode */
+	ret = EX_USAGE;
 	if (hsfs_opts->spec == NULL){
-		ret = 1;
+		nfs_error(_("%s: no nfs target provided"), progname);
 		goto out_usage;
 	}
 	if (fuse_opts->mountpoint == NULL) {
+		nfs_error(_("%s: no mount point provided"), progname);
+		goto out_usage;
+	}
+	/* TODO: Check other options? */
+	ret = nfs_parse_devname(hsfs_opts->spec, &hsfs_opts->hostname,
+				&hsfs_opts->hostpath);
+	if (ret == 0) {
 		ret = 1;
 		goto out_usage;
+	}
+
+	/* Take nfs version errors as mount fail. */
+	ret = EX_FAIL;
+	if (hsfs_opts->nfsvers != 4 && hsfs_opts->nfsvers != 3
+	    && hsfs_opts->nfsvers != 0){
+		nfs_error(_("%s: unsupported NFS version: %d"), progname, hsfs_opts->nfsvers);
+		goto out;
 	}
 
 	return 0;
@@ -437,6 +456,7 @@ out_usage:
 	exit_usage(ret);
 	/* Never reach here... */
 out:
+	exit(ret);
 	return ret;
 }
 

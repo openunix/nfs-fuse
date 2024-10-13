@@ -6,7 +6,7 @@ AC_INIT([nfs-fuse], [0.3.3], [steve.shuo.feng@gmail.com])
 AC_CONFIG_SRCDIR([fuse/hsfs_main.c])
 AC_CONFIG_HEADERS([include/config.h])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 # SLES 11SP2 (automake-1.10.1) doesn't have this
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -50,7 +50,7 @@ AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h limits.h memory.h mntent.h netdb.h netinet/in.h paths.h stdlib.h string.h sys/mount.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 # Required by the built-in libnfs
-AC_CHECK_HEADERS([sys/sysmacros.h utime.h net/if.h sys/statvfs.h])
+AC_CHECK_HEADERS([sys/sysmacros.h poll.h utime.h net/if.h sys/statvfs.h])
 
 AC_CHECK_HEADERS([nfsc/libnfs-raw.h])
 
@@ -111,5 +111,6 @@ AC_CONFIG_FILES([Makefile
 		 lib/Makefile
 		 nfs_common/Makefile
 		 utils/Makefile
+		 tests/Makefile
 		])
 AC_OUTPUT

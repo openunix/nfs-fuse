@@ -581,7 +581,7 @@ out:
 	return ret;
 }
 
-int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
+int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 				  struct hsfs_super *super)
 {
 	char *spec = hsfs_opts->spec;
@@ -618,9 +618,8 @@ int hsfs_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 		goto fail;
 	}
 
-	strcpy(hostdir, spec);
-	if (!nfs_parse_devname(hostdir, &hostname, &dirname))
-		goto fail;
+	hostname = hsfs_opts->hostname;
+	dirname = hsfs_opts->hostpath;
 
 	if (hsi_gethostbyname(hostname, &super->addr) != 0)
 		goto fail;
