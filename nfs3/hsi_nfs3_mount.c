@@ -27,7 +27,6 @@
 #include "fstab.h"
 
 #include <hsfs/err.h>
-#include <hsfs/hsi_nfs.h>
 
 
 typedef dirpath mntarg_t;

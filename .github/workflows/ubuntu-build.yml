@@ -13,8 +13,26 @@ jobs:
 
     steps:
     - name: install dependency
-      run: sudo apt install libtirpc-dev libfuse3-dev libkrb5-dev libnfs-dev libtest-simple-perl
-    - uses: actions/checkout@v4
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          libtirpc-dev libfuse3-dev libkrb5-dev libtest-simple-perl \
+          cmake nfs-kernel-server nfs-common valgrind
+    - name: Checkout nfs-fuse
+      uses: actions/checkout@v4
+    - name: Checkout libnfs
+      uses: actions/checkout@v4
+      with:
+        repository: sahlberg/libnfs
+        ref: libnfs-5.0.3
+        path: libnfs
+    - name: Build and install libnfs
+      run: |
+        mkdir libnfs/build
+        cd libnfs/build
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_VERBOSE_MAKEFILE=yes ..
+        make
+        sudo make install
     - name: autogen.sh
       run: ./autogen.sh
     - name: configure

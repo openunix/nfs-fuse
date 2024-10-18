@@ -16,7 +16,7 @@ noinst_HEADERS = \
     hsfs/err.h  \
     hsfs/hash.h  \
     hsfs/hashtable.h  \
-    hsfs/hsi_nfs.h  \
+    hsfs_nfs.h  \
     hsfs/list.h  \
     hsfs/log2.h  \
     hsfs/types.h \

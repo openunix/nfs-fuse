@@ -2,7 +2,7 @@
 #define __HSI_NFS3_H__
 
 #include "hsfs.h"
-#include <hsfs/hsi_nfs.h>
+#include <hsfs_nfs.h>
 
 #include "acl3.h"
 #include "acl.h"

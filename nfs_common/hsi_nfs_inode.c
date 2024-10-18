@@ -34,7 +34,7 @@
 #ifndef __KERNEL__
 
 #include <hsfs/err.h>
-#include <hsfs/hsi_nfs.h>
+#include <hsfs_nfs.h>
 
 #define S_IRWXUGO (S_IRWXU|S_IRWXG|S_IRWXO)
 #define S_IALLUGO (S_ISUID|S_ISGID|S_ISVTX|S_IRWXUGO)

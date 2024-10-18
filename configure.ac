@@ -34,7 +34,7 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([fuse3], [fuse_session_mount], [], AC_MSG_ERROR([You need libfuse3 to run.]))
 AC_CHECK_LIB([tirpc], [clnt_tp_create], [], AC_MSG_ERROR([You need libtirpc to run.]))
 
-AC_CHECK_LIB([nfs], [rpc_nfs4_compound_async], [], AC_MSG_ERROR([You need libnfs to run.]))
+AC_CHECK_LIB([nfs], [rpc_nfs4_compound_async2], [], AC_MSG_ERROR([You need libnfs 5.0.x to run.]))
 
 FUSE_CFLAGS=`pkg-config fuse3 --cflags`
 AC_SUBST(FUSE_CFLAGS)

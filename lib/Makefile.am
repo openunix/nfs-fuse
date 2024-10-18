@@ -7,4 +7,4 @@ libhsfs_a_SOURCES = hsfs_inode.c hsfs_ops.c
 
 libnfsi_a_CPPFLAGS = $(AM_CPPFLAGS) \
 		     "-D_U_=__attribute__((unused))"
-libnfsi_a_SOURCES = nfs_v4.c init.c libnfs.c libnfs-sync.c
+libnfsi_a_SOURCES = nfs_v4.c libnfs-sync.c

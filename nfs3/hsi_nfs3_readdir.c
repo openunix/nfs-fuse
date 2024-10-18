@@ -17,7 +17,6 @@
  * along with HSFS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <hsfs/hsi_nfs.h>
 #include "hsfs.h"
 #include "hsi_nfs3.h"
 #include "log.h"
