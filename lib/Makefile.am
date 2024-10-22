@@ -3,7 +3,7 @@ AM_CFLAGS = -Wall -Wextra
 
 noinst_LIBRARIES = libhsfs.a libnfsi.a
 libhsfs_a_CPPFLAGS = $(AM_CPPFLAGS) $(TIRPC_HEADERS)
-libhsfs_a_SOURCES = hsfs_inode.c hsfs_ops.c
+libhsfs_a_SOURCES = hsfs_inode.c hsfs_nfs.c
 
 libnfsi_a_CPPFLAGS = $(AM_CPPFLAGS) \
 		     "-D_U_=__attribute__((unused))"

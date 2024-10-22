@@ -107,6 +107,8 @@
 #include "libnfs-raw-nfs4.h"
 #include "libnfs-private.h"
 
+#include "libnfsi.h"
+
 struct sync_cb_data {
 	int is_finished;
 	int status;
@@ -304,13 +306,15 @@ mount_cb(int status, struct nfs_context *nfs, void *data, void *private_data)
                               __FUNCTION__, nfs_get_error(nfs));
                 goto finished;
 	}
+	memcpy(cb_data->return_data, data, sizeof(struct nfs_fattr));
 
  finished:
         cb_data_is_finished(cb_data, status);
 }
 
 int
-try_mount(struct nfs_context *nfs, const char *server, const char *export)
+nfs_mount2(struct nfs_context *nfs, const char *server, const char *export,
+	   struct nfs_fattr *fattr)
 {
 	struct sync_cb_data cb_data;
 	struct rpc_context *rpc = nfs_get_rpc_context(nfs);
@@ -318,11 +322,12 @@ try_mount(struct nfs_context *nfs, const char *server, const char *export)
 	assert(rpc->magic == RPC_CONTEXT_MAGIC);
 	assert(nfs->nfsi->version == NFS_V4);
 
+	cb_data.return_data = fattr;
         if (nfs_init_cb_data(&nfs, &cb_data)) {
                 return -1;
         }
 
-	if (nfs4_mount_async(nfs, server, export, mount_cb, &cb_data) != 0) {
+	if (nfs4_mount_async2(nfs, server, export, mount_cb, &cb_data) != 0) {
 		nfs_set_error(nfs, "nfs_mount_async failed. %s",
 			      nfs_get_error(nfs));
                 nfs_destroy_cb_sem(&cb_data);
@@ -344,6 +349,11 @@ try_mount(struct nfs_context *nfs, const char *server, const char *export)
 	}
 
 	return cb_data.status;
+}
+
+struct nfs_fhi *nfs_get_rootfhi(struct nfs_context *nfs)
+{
+	return (struct nfs_fhi *)&nfs->nfsi->rootfh;
 }
 
 #if 0

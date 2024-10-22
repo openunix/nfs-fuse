@@ -22,4 +22,6 @@ noinst_HEADERS = \
     hsfs/types.h \
     libnfs-private.h \
     libnfs-multithreading.h \
-    slist.h
+    slist.h \
+    libnfsi.h \
+    nfs_xdr.h

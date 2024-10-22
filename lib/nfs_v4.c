@@ -106,6 +106,8 @@
 #include "libnfs-raw-nfs4.h"
 #include "libnfs-private.h"
 
+#include "nfs_xdr.h"
+
 #ifndef discard_const
 #define discard_const(ptr) ((void *)((intptr_t)(ptr)))
 #endif
@@ -1462,6 +1464,127 @@ nfs4_populate_access(struct nfs4_cb_data *data, nfs_argop4 *op)
         return nfs4_op_access(data->nfs, op, mode);
 }
 
+static int
+nfs4_dec_getattr(struct nfs_context *nfs, struct nfs4_cb_data *data,
+                 struct nfs_fattr *fattr, const char *buf, int len)
+{
+        int type, slen, pad;
+
+        /* Type */
+        CHECK_GETATTR_BUF_SPACE(len, 4);
+        type = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        /* Size */
+        CHECK_GETATTR_BUF_SPACE(len, 8);
+        fattr->size = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        /* Inode */
+        CHECK_GETATTR_BUF_SPACE(len, 8);
+        pad = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        /* Mode */
+        CHECK_GETATTR_BUF_SPACE(len, 4);
+        pad = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        /* Num Links */
+        CHECK_GETATTR_BUF_SPACE(len, 4);
+        fattr->nlink = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        /* Owner */
+        CHECK_GETATTR_BUF_SPACE(len, 4);
+        slen = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        pad = (4 - (slen & 0x03)) & 0x03;
+        CHECK_GETATTR_BUF_SPACE(len, slen);
+        fattr->uid = nfs_get_ugid(nfs, buf, slen, 1);
+        buf += slen;
+        CHECK_GETATTR_BUF_SPACE(len, pad);
+        buf += pad;
+        len -= pad;
+        /* Group */
+        CHECK_GETATTR_BUF_SPACE(len, 4);
+        slen = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        pad = (4 - (slen & 0x03)) & 0x03;
+        CHECK_GETATTR_BUF_SPACE(len, slen);
+        fattr->gid = nfs_get_ugid(nfs, buf, slen, 0);
+        buf += slen;
+        CHECK_GETATTR_BUF_SPACE(len, pad);
+        buf += pad;
+        len -= pad;
+        /* Space Used */
+        CHECK_GETATTR_BUF_SPACE(len, 8);
+        fattr->du.nfs3.used = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        /* ATime */
+        CHECK_GETATTR_BUF_SPACE(len, 12);
+        fattr->atime.tv_sec = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        fattr->atime.tv_nsec = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        /* CTime */
+        CHECK_GETATTR_BUF_SPACE(len, 12);
+        fattr->ctime.tv_sec = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        fattr->ctime.tv_nsec = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+        /* MTime */
+        CHECK_GETATTR_BUF_SPACE(len, 12);
+        fattr->mtime.tv_sec = nfs_pntoh64((uint32_t *)(void *)buf);
+        buf += 8;
+        len -= 8;
+        fattr->mtime.tv_nsec = ntohl(*(uint32_t *)(void *)buf);
+        buf += 4;
+        len -= 4;
+
+        return 0;
+}
+
+static void
+nfs4_getattr_cb(struct rpc_context *rpc, int status, void *command_data,
+                void *private_data)
+{
+        struct nfs4_cb_data *data = private_data;
+        struct nfs_context *nfs = data->nfs;
+        COMPOUND4res *res = command_data;
+        GETATTR4resok *garesok;
+        struct nfs_fattr fattr;
+        int i;
+
+        assert(rpc->magic == RPC_CONTEXT_MAGIC);
+        if (check_nfs4_error(nfs, status, data, res, "GETATTR")) {
+                return;
+        }
+
+        if ((i = nfs4_find_op(nfs, data, res, OP_GETATTR, "GETATTR")) < 0) {
+                return;
+        }
+        garesok = &res->resarray.resarray_val[i].nfs_resop4_u.opgetattr.GETATTR4res_u.resok4;
+
+        memset(&fattr, 0, sizeof(fattr));
+        if (nfs4_dec_getattr(nfs, data, &fattr,
+			garesok->obj_attributes.attr_vals.attrlist4_val,
+                        garesok->obj_attributes.attr_vals.attrlist4_len) < 0) {
+                data->cb(-EINVAL, nfs, nfs_get_error(nfs), data->private_data);
+                free_nfs4_cb_data(data);
+        }
+
+        data->cb(0, nfs, &fattr, data->private_data);
+        free_nfs4_cb_data(data);
+}
+
 static void
 nfs4_mount_4_cb(struct rpc_context *rpc, int status, void *command_data,
                 void *private_data)
@@ -1495,9 +1618,7 @@ nfs4_mount_4_cb(struct rpc_context *rpc, int status, void *command_data,
                gfhresok->object.nfs_fh4_val,
                nfs->nfsi->rootfh.len);
 
-
-        data->cb(0, nfs, NULL, data->private_data);
-        free_nfs4_cb_data(data);
+	nfs4_getattr_cb(rpc, status, command_data, private_data);
 }
 
 static void
@@ -1611,8 +1732,8 @@ nfs4_mount_1_cb(struct rpc_context *rpc, int status, void *command_data,
 }
 
 int
-nfs4_mount_async(struct nfs_context *nfs, const char *server,
-                 const char *export, nfs_cb cb, void *private_data)
+nfs4_mount_async2(struct nfs_context *nfs, const char *server,
+                  const char *export, nfs_cb cb, void *private_data)
 {
         struct nfs4_cb_data *data;
         char *new_server, *new_export;

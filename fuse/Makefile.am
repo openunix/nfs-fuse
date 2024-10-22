@@ -6,7 +6,7 @@ bin_PROGRAMS = nfs-fuse
 nfs_fuse_LDADD = libhsx_fuse.a $(top_builddir)/nfs3/libhsi_nfs3.a \
 	$(top_builddir)/lib/libhsfs.a $(top_builddir)/nfs_common/libhsi_nfsc.a \
 	$(top_builddir)/utils/libmount.a $(top_builddir)/lib/libnfsi.a
-nfs_fuse_SOURCES = xcommon.c hsfs_main.c
+nfs_fuse_SOURCES = xcommon.c hsfs_main.c hsfs_ops.c
 
 noinst_LIBRARIES = libhsx_fuse.a
 libhsx_fuse_a_SOURCES = hsx_fuse_getattr.c hsx_fuse_statfs.c hsx_fuse_init.c \

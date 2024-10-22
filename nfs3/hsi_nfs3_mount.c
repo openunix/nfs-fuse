@@ -609,7 +609,7 @@ int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 	char *s = NULL;
 	time_t timeout, t;
 
-	DEBUG_IN("(%s, %s, %s)", spec, point, udata);
+	DEBUG_IN("(%s, %s)", spec, udata);
 
 	memset(&mntres, 0, sizeof(mntres));
 	if (strlen(spec) >= sizeof(hostdir)) {
@@ -745,7 +745,7 @@ int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
 		free(mntres.mountres3_u.mountinfo.fhandle.fhandle3_val);
 	}
 
-	DEBUG_OUT("Success.");
+	DEBUG_OUT("Success. %d", 0);
 
 	return 0;
 
@@ -761,7 +761,7 @@ fail:
 	return ret;
 }
 
-int hsfs_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
+int nfs3_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
 					struct hsfs_super *super)
 {
 	char hostdir[1024] = {};

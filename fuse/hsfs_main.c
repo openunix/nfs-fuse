@@ -13,6 +13,7 @@
 #include <libgen.h>
 #include <getopt.h>
 #include <errno.h>
+#include <fuse_opt.h>
 
 #include "log.h"
 #include "hsfs.h"
@@ -357,12 +358,13 @@ static void hsi_parse_opts(const char *options, int *flags,
 	{ t, offsetof(struct hsfs_cmdline_opts, p), 1 }
 static const struct fuse_opt hsfs_cmdline_spec[] = {
 	/* CMD options, -r, -V, -w, -f, -h will be handled by fuse,
-	while -f has a different meaning in fuse, use --fake instead. */
+	while -f has a different meaning in fuse, add it back later. */
 	HSFS_CMD_OPT("--fake", fake),
-	FUSE_OPT_KEY("-v", 'v'),
-	FUSE_OPT_KEY("-f", 'f'),
+	HSFS_CMD_OPT("-f", fake),
+	HSFS_CMD_OPT("debug=%x", debug),
 	HSFS_CMD_OPT("nfsvers=%d", nfsvers),
 	HSFS_CMD_OPT("vers=%d", nfsvers),
+
 	FUSE_OPT_END
 };
 
@@ -414,7 +416,12 @@ static int hsfs_parse_cmdline(struct fuse_args *args,
 	if (ret != 0)
 		goto out_usage;
 
-	/* add subtype args */
+	/* add back debug and fake options */
+	if ((hsfs_opts->debug & HSFS_DEBUG_LIBFUSE))
+		ret = fuse_opt_add_arg(args, "-d");
+	if (hsfs_opts->fake)
+		ret = fuse_opt_add_arg(args, "-f");
+
 	ret = fuse_parse_cmdline(args, fuse_opts);
 	if (ret != 0)
 		goto out_usage;
@@ -485,6 +492,8 @@ int main(int argc, char **argv)
 	err = hsfs_do_mount(&hsfs_opts, &super);
 	if (err)
 		goto out;
+	if (hsfs_opts.fake)
+		goto err_out1;
 
 	err = -1;
 	se = fuse_session_new(&args, &hsfs_oper, sizeof(hsfs_oper), &super);

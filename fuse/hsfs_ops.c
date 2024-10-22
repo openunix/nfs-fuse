@@ -20,8 +20,39 @@
 # include "config.h"
 #endif
 
-#include <errno.h>
+#include <fuse_log.h>
+#include <hsfs_nfs.h>
 
+#define LOG_FATTR_TIME(f, t) fuse_log(FUSE_LOG_DEBUG, "nfs_fattr: " #t "time: %lld.%ld\n", f->t##time.tv_sec, f->t##time.tv_nsec)
+
+void hsfs_log_fattr(struct nfs_fattr *fattr)
+{
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fattr: %p, valid: 0x%x\n", fattr, fattr->valid);
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fattr: size: %lld, used: %lld\n", fattr->size, fattr->du.nfs3.used);
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fattr: nlink: %d, mode: 0x%x\n", fattr->nlink, fattr->mode);
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fattr: uid: %d, gid: 0x%d\n", fattr->uid, fattr->gid);
+	LOG_FATTR_TIME(fattr, a);
+	LOG_FATTR_TIME(fattr, m);
+	LOG_FATTR_TIME(fattr, c);
+
+}
+
+void hsfs_log_nfsfh(struct nfs_fh *nfh)
+{
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fh: %p, size: %d, data: %p\n", nfh, nfh->size, nfh->data);
+	fuse_log(FUSE_LOG_DEBUG, "nfs_fh->data: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+		 nfh->data[0], nfh->data[1], nfh->data[2], nfh->data[3],
+		 nfh->data[4], nfh->data[5], nfh->data[6], nfh->data[7],
+		 nfh->data[8], nfh->data[9], nfh->data[10], nfh->data[11],
+		 nfh->data[12], nfh->data[13], nfh->data[14], nfh->data[15]);
+}
+
+void hsfs_log_super(struct hsfs_super *sb)
+{
+	fuse_log(FUSE_LOG_DEBUG, "SB: %p\n", sb);
+}
+
+#if 0
 #include "libnfs.h"
 #include "hsfs.h"
 
@@ -64,3 +95,4 @@ int rpc_nfs4_compound_async2(struct rpc_context *rpc, rpc_cb cb,
 	assert(!"Not implemented");
 	return -1;
 }
+#endif

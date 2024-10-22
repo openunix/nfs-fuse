@@ -184,6 +184,8 @@ struct hsfs_super
 	DECLARE_HASHTABLE(fh_table, HSFS_FH_HASH_BITS); /* For HSFS iget5 */
 	DECLARE_HASHTABLE(id_table, HSFS_ID_HASH_BITS);	/* For HSFS iget/ilookup */
 	struct hsfs_super_ops *sop;
+	unsigned int version;
+	void *private;
 
 	/* XXX need protected by mutex */
 	unsigned long curr_id;
@@ -318,11 +320,23 @@ struct hsfs_cmdline_opts{
         int fake;
         int fg;
 	int nfsvers;
+	unsigned int debug;
 	char *hostname;
 	char *hostpath;
         char *spec;
         /* Temporary for backwards compact */
         char *udata;
 };
+
+/*
+ * Layout of the debug flag (by OR):
+ *   0x0000 ~ 0x0007	libnfs (currently 0, 1, 2 only)
+ *   0x0008		libfuse, single bit
+ *   0x0010 ~ 0x00F0	HSFS layer
+ */
+#define HSFS_DEBUG_LIBNFS  0x7
+#define HSFS_DEBUG_LIBFUSE 0x8
+#define HSFS_DEBUG_FOREGND 0xF
+#define HSFS_DEBUG_OPMOUNT 0x10
 
 #endif

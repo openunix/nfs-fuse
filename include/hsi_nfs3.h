@@ -365,5 +365,8 @@ static inline void hsi_nfs3_getfh3(struct hsfs_inode *inode, struct nfs_fh3 *fh)
 int hsi_nfs3_do_getattr(struct hsfs_super *sb, struct nfs_fh3 *fh,
 			struct nfs_fattr *fattr, struct stat *st);
 extern void hsi_nfs3_fattr2fattr(struct fattr3 *f, struct nfs_fattr *t);
-
+int nfs3_do_mount(struct hsfs_cmdline_opts *hsfs_opts,
+				  struct hsfs_super *super);
+int nfs3_do_unmount(struct hsfs_cmdline_opts *hsfs_opts,
+				  struct hsfs_super *super);
 #endif

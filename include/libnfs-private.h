@@ -603,8 +603,8 @@ int nfs4_mkdir2_async(struct nfs_context *nfs, const char *path, int mode,
                       nfs_cb cb, void *private_data);
 int nfs4_mknod_async(struct nfs_context *nfs, const char *path, int mode,
                      int dev, nfs_cb cb, void *private_data);
-int nfs4_mount_async(struct nfs_context *nfs, const char *server,
-		     const char *export, nfs_cb cb, void *private_data);
+int nfs4_mount_async2(struct nfs_context *nfs, const char *server,
+		      const char *export, nfs_cb cb, void *private_data);
 int nfs4_open_async(struct nfs_context *nfs, const char *path, int flags,
                     int mode, nfs_cb cb, void *private_data);
 int nfs4_opendir_async(struct nfs_context *nfs, const char *path, nfs_cb cb,
